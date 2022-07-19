@@ -43,3 +43,7 @@ spring.jpa.hibernate.ddl-auto=create-drop
   - update: Update the schema if necessary.
   - create: Create the schema and destroy previous data.
   - create-drop: Create and then destroy the schema at the end of the session.
+
+Now, we can check changed server port with ```loacalhost:3000```, and h2 console in ```localhost:3000/h2-console```.
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/179660342-257d3ed8-f114-487e-9090-8ace1fe5f10b.png">
