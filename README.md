@@ -105,6 +105,33 @@ In the ```home.html```, we can add thymeleaf attribute to use ```th``` method an
 <html xmlns:th="http://www.thymeleaf.org">
 ```
 
+If you run debug with ```SeedData```, it can be seen like below.
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180105039-ff9e60c9-1cee-4566-8516-220be6711db9.png">
+
+## Create PostController, and post.html
+
+As ```HomeController```, you can add ```PostController``` with ```getPost``` public class. If requested post id exists, the post would be shown. If not, ```404.html``` will be occured.
+
+Annotations
+- PathVariable: @PathVariable is a Spring annotation which indicates that a method parameter should be bound to a URI template variable. It has the following optional elements: name - name of the path variable to bind to. required - tells whether the path variable is required. value - alias for name.
+
+```java
+    @GetMapping("/posts/{id}")
+    public String getPost(@PathVariable Long id, Model model) {
+        // find the post by id
+        Optional<Post> optionalPost = postService.getById(id);
+        // if the post exists, then show it into the model
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            model.addAttribute("post", post);
+            return "post";
+        } else {
+            return "404";
+        }
+    }
+```
+
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
 - https://projectlombok.org/features/GetterSetter
