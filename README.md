@@ -132,6 +132,40 @@ Annotations
     }
 ```
 
+## Make Account feature
+
+In this stage, we will make Account festure by using Jparepository. 
+
+### 1. Account model
+
+First of all, make an ```Account``` class on the ```models``` package. Such as ```Post``` class, @Entity, @Getter, @Setter, @Id, @GeneratedValue annotations would be needed. Relationship betweem account and posts is OneToMany, so @OneToMany annotation is added with ```mappedBy``` account.
+
+### 2. Add ManyToOne relationship on the post class
+
+Connection between posts and account would be ManyToOne relationship. To make this connectivity, we need to add code like below.
+
+```java
+// Connection with account
+@NotNull
+@ManyToOne
+@JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
+private Account account;
+```
+
+### 3. Account Repository
+
+In order to save account repository, you can create ```AccountRepository``` interface inside of ```repositories``` package.
+
+### 4. Account Service
+
+```AccountService``` class can do a role as a service for saving account into the account repositories. After that, we can test this by changing ```SeedData``` class.
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180368338-60a5cd23-19b5-43bd-bf92-45eebde24da8.png">
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180368509-61799e64-0b4c-498e-b93b-94d1ff98a178.png">
+
+You can see the ```Account``` column and each of posts connected with ```account_id```.
+
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
 - https://projectlombok.org/features/GetterSetter
