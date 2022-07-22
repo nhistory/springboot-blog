@@ -8,8 +8,11 @@
 </head>
 <body>
 <div class="container">
-    <h2 th:text="${post.title}">Title</h2>
-    <h5 th:text="'Created on ' + ${post.createdAt}">Created At</h5>
-    <p th:text="${post.body}">body text</p>
+    <a th:href="@{'/'}">Home</a>
+    <div class="post">
+        <h2 th:text="${post.title}">Title</h2>
+        <h5 th:text="'Created on ' + ${post.createdAt}">Created At</h5>
+        <p th:text="${post.body}">body text</p>
+    </div>
 </div>
 </body>
