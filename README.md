@@ -187,6 +187,12 @@ First of all, you can add mapping on the ```PostController``` to connect new pos
             return "404";
         }
     }
+    
+@PostMapping("/posts/new")
+public String saveNewPost(@ModelAttribute Post post) {
+    postService.save(post);
+    return "redirect:/posts/" + post.getId();
+}
 ```
 
 New post should be matched with account information, so ```accountService``` obeject needed.
