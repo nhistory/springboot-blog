@@ -166,6 +166,84 @@ In order to save account repository, you can create ```AccountRepository``` inte
 
 You can see the ```Account``` column and each of posts connected with ```account_id```.
 
+## Add new post feature
+
+For now, we should make feature for adding new post. To doing this, ```PostController```,```AccountService```,```AccountRepository``` need to be modified.
+
+### 1. Add new post mapping
+
+First of all, you can add mapping on the ```PostController``` to connect new post url.
+
+```java
+@GetMapping("/posts/new")
+    public String createNewPost(Model model) {
+        Optional<Account> optionalAccount = accountService.findByEmail("user.user@domain.com");
+        if (optionalAccount.isPresent()) {
+            Post post = new Post();
+            post.setAccount(optionalAccount.get());
+            model.addAttribute("post", post);
+            return "post_new";
+        } else {
+            return "404";
+        }
+    }
+```
+
+New post should be matched with account information, so ```accountService``` obeject needed.
+
+``` java
+    @Autowired
+    private AccountService accountService;
+```
+
+### 2. Create findByEmail method
+
+In order to find account, ```findByEmail``` method has to be made.
+
+```java
+    public Optional<Account> findByEmail(String email) {
+        return accountRepository.findOneByEmail(email);
+    }
+```
+
+As you can see, ```findByEmail``` method need information from ```accountRepository```. So we need to add ```findOneByEmail``` method on the ```accountRepository```.
+
+### 3. Make findOneByEmail method
+
+```java
+public interface AccountRepository extends JpaRepository<Account, Long> {
+    Optional<Account> findOneByEmail(String email);
+}
+```
+
+Finally, we need ```post_new.html``` page.
+
+### 4. Create post_new web page.
+
+```html
+<div class="container">
+    <a th:href="@{'/'}">Home</a>
+    <form action="#" th:action="@{'/posts/new'}" th:object="${post}" method="POST">
+        <input type="hidden" th:field="*{account}" />
+        <input type="hidden" th:field="*{createdAt}" />
+        <h2>Write new Post</h2>
+        <div>
+            <label for="new-post-title">Title</label>
+            <input id="new-post-title" type="text" th:field="*{title}" placeholder="Title" />
+        </div>
+        <div>
+            <label for="new-post-body">Body</label>
+            <textarea id="new-post-body" type="text" th:field="*{body}" placeholder="Enter the text"></textarea>
+        </div>
+        <button type="submit">Publish Post</button>
+    </form>
+</div>
+```
+
+Eventually we can check ```post_new``` page like below.
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180657557-c257bf32-29fe-48f5-a39f-0a4b74e245f9.png">
+
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
 - https://projectlombok.org/features/GetterSetter
