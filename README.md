@@ -312,3 +312,4 @@ A ```HttpSecurity``` is similar to Spring Security's XML <http> element in the n
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
 - https://projectlombok.org/features/GetterSetter
+- https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/web/builders/HttpSecurity.html
