@@ -2,7 +2,10 @@
 
 ## Instruction
 
-A simple blog application built with spring boot, spring jpa, h2, and security. 
+A simple blog application built with spring boot, spring jpa, h2, and security.
+- Built a spring boot application with Spring Web, Spring Boot DevTools, Thymleaf, Lombok.
+- Developed CRUD feature for post by using models, controllers and services.
+- Made data communication with JPA between repositories and services.
 
 ## Initialize spring boot project
 
@@ -249,6 +252,62 @@ Finally, we need ```post_new.html``` page.
 Eventually we can check ```post_new``` page like below.
 
 <img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180657557-c257bf32-29fe-48f5-a39f-0a4b74e245f9.png">
+
+## Add security feature
+
+### 1. Update maven dependency
+
+Now we can handle post and account information, but security feature is not set. For doing this, ```pom.xml``` dependencies have to be added. Add ```dependency``` like below and reload this project.
+
+```
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
+		</dependency>
+```
+
+Restart server and check ```localhost:3000```. You can see this new login page.
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/180875374-fb6f03a9-8c4d-4b8f-b9a8-39168b058c31.png">
+
+### 2. Make web security config
+
+After adding security dependency, ```WebSecurityConfig``` file should be added to control accessibility.
+
+```java
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class WebSecurityConfig {
+
+    private static final String[] WHITELIST = {
+            "/"
+    };
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .antMatchers(WHITELIST).permitAll()
+                .anyRequest().authenticated();
+
+        return http.build();
+    }
+}
+```
+
+Annotations
+- EnableWebSecurity: The WebSecurityConfig class is annotated with @EnableWebSecurity to enable Spring Security's web security support and provide the Spring MVC integration. It also extends WebSecurityConfigurerAdapter and overrides a couple of its methods to set some specifics of the web security configuration.
+- EnableGlobalMethodSecurity: The prePostEnabled property enables Spring Security pre/post annotations. The securedEnabled property determines if the @Secured annotation should be enabled. The jsr250Enabled property allows us to use the @RoleAllowed annotation.
+
+What is SecurityFilterChain?
+
+Spring Security maintains a filter chain internally where each of the filters has a particular responsibility and filters are added or removed from the configuration depending on which services are required. The ordering of the filters is important as there are dependencies between them.
+
+A ```HttpSecurity``` is similar to Spring Security's XML <http> element in the namespace configuration. It allows configuring web based security for specific http requests. By default it will be applied to all requests, but can be restricted using requestMatcher(RequestMatcher) or other similar methods.
 
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
