@@ -6,6 +6,7 @@ A simple blog application built with spring boot, spring jpa, h2, and security.
 - Built a spring boot application with Spring Web, Spring Boot DevTools, Thymleaf, Lombok.
 - Developed CRUD feature for post by using models, controllers and services.
 - Made data communication with JPA between repositories and services.
+- Implemented login authority feature with spring security.
 
 ## Initialize spring boot project
 
