@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -25,10 +26,20 @@
             </div>
         </div>
         <hr />
-        <ul>
+<!--        When user is NOT authenticated-->
+        <ul sec:authorize="!isAuthenticated()">
             <li><a th:href="@{/register}">Register</a></li>
             <li><a th:href="@{/login}">Login</a></li>
         </ul>
+<!--        When user is authenticated-->
+        <div sec:authorize="isAuthenticated()">
+            <form action="#" th:action="@{/logout}" method="POST">
+                <div class="form-group">
+                    <label>Hi, <span sec:authentication="name">Username</span></label>
+                </div>
+                <button type="submit">Logout</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
