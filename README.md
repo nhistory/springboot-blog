@@ -310,6 +310,38 @@ Spring Security maintains a filter chain internally where each of the filters ha
 
 A ```HttpSecurity``` is similar to Spring Security's XML <http> element in the namespace configuration. It allows configuring web based security for specific http requests. By default it will be applied to all requests, but can be restricted using requestMatcher(RequestMatcher) or other similar methods.
 
+### 3. Use thymeleaf spring-security
+	
+In order to use ```spring-security```, starting point would be an adding attribute on the ```html``` tag.
+
+home.html
+```html
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://thymeleaf.org/extras/spring-security">
+```
+
+Now you can use security feature with ```sec```, such as ```sec:authorize```, ```sec:authentication```.
+
+```html
+<!--        When user is NOT authenticated-->
+        <ul sec:authorize="!isAuthenticated()">
+            <li><a th:href="@{/register}">Register</a></li>
+            <li><a th:href="@{/login}">Login</a></li>
+        </ul>
+<!--        When user is authenticated-->
+        <div sec:authorize="isAuthenticated()">
+            <form action="#" th:action="@{/logout}" method="POST">
+                <div class="form-group">
+                    <label>Hi, <span sec:authentication="name">Username</span></label>
+                </div>
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+```
+
+<img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/181372334-a2fbe034-9829-4238-a654-38732239cab8.png">
+
+	
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
 - https://projectlombok.org/features/GetterSetter
