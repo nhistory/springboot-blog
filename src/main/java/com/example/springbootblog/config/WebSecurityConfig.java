@@ -13,7 +13,6 @@ public class WebSecurityConfig {
 
     private static final String[] WHITELIST = {
             "/register",
-            "/login",
             "/h2-console/*",
             "/"
     };
@@ -25,6 +24,23 @@ public class WebSecurityConfig {
                 .antMatchers(WHITELIST).permitAll()
                 .antMatchers(HttpMethod.GET,"/posts/*").permitAll()
                 .anyRequest().authenticated();
+
+        // Add login authentication feature
+        http
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/",true)
+                .failureUrl("/login?error")
+                .permitAll()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .and()
+                .httpBasic();
 
         // when you move away from h2-console you can remove these
         http.csrf().disable();
