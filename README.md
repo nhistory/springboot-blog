@@ -1,5 +1,42 @@
 # springboot-blog
 
+https://user-images.githubusercontent.com/39740066/181830857-0d1e19c2-4aab-4f96-9376-3982b17e8422.mov
+
+## Table of Contents
+
+  * [Instruction](#instruction)
+  * [Initialize spring boot project](#initialize-spring-boot-project)
+    + [specification](#specification)
+  * [application properties](#application-properties)
+  * [Add objects](#add-objects)
+    + [Post](#post)
+    + [PostRepository](#postrepository)
+    + [PostService](#postservice)
+  * [Test this basic data structure](#test-this-basic-data-structure)
+    + [What is bean in spring boot?](#what-is-bean-in-spring-boot)
+  * [Make HomeController and home.html](#make-homecontroller-and-homehtml)
+  * [Create PostController, and post.html](#create-postcontroller-and-posthtml)
+  * [Make Account feature](#make-account-feature)
+    + [1. Account model](#1-account-model)
+    + [2. Add ManyToOne relationship on the post class](#2-add-manytoone-relationship-on-the-post-class)
+    + [3. Account Repository](#3-account-repository)
+    + [4. Account Service](#4-account-service)
+  * [Add new post feature](#add-new-post-feature)
+    + [1. Add new post mapping](#1-add-new-post-mapping)
+    + [2. Create findByEmail method](#2-create-findbyemail-method)
+    + [3. Make findOneByEmail method](#3-make-findonebyemail-method)
+    + [4. Create post_new web page.](#4-create-post_new-web-page)
+  * [Add security feature](#add-security-feature)
+    + [1. Update maven dependency](#1-update-maven-dependency)
+    + [2. Make web security config](#2-make-web-security-config)
+    + [3. Use thymeleaf spring-security](#3-use-thymeleaf-spring-security)
+  * [Edit, Delete feature](#edit-delete-feature)
+    + [1. Record post updated local time](#1-record-post-updated-local-time)
+    + [2. Add edit and delete link on the post.html](#2-add-edit-and-delete-link-on-the-posthtml)
+    + [3. Mapping post url with preauthorized condition](#3-mapping-post-url-with-preauthorized-condition)
+    + [4. Delete feature](#4-delete-feature)
+  * [References](#references)
+
 ## Instruction
 
 A simple blog application built with spring boot, spring jpa, h2, and security.
@@ -7,6 +44,7 @@ A simple blog application built with spring boot, spring jpa, h2, and security.
 - Developed CRUD feature for post by using models, controllers and services.
 - Made data communication with JPA between repositories and services.
 - Implemented login authority feature with spring security.
+- Divided user authority roles such as delete posting depends on the login status.
 
 ## Initialize spring boot project
 
@@ -341,6 +379,106 @@ Now you can use security feature with ```sec```, such as ```sec:authorize```, ``
 
 <img width="450" alt="image" src="https://user-images.githubusercontent.com/39740066/181372334-a2fbe034-9829-4238-a654-38732239cab8.png">
 
+## Edit, Delete feature
+
+Finally, the only feature that you probably want to add is ```Update``` and ```Delete```. For doing this, we need to make several codes on some part of this system.
+
+### 1. Record post updated local time
+
+We already record local date and time with ```createdAt``` variable on the ```Post.java```. And additional variable for recording updated date and time is ```updatedAt```. And it can be added ```toString``` method to print created and updated time like below.
+
+Post.java
+```java
+private LocalDateTime updatedAt;
+
+@Override
+    public String toString() {
+        return "Post{" + "id=" + id + ", title='" + title + "'" + ", createdAt='" + createdAt + "'" + ", updatedAt='" + updatedAt + "'" + "}";
+    }
+```
+
+### 2. Add edit and delete link on the post.html
+
+In order to add ```Edit``` and ```Delete``` link, we need to add ```xmlns:sec="http://thymeleaf.org/extras/spring-security"``` attribute on the ```post.html```. After that, ```sec:authorize="isAuthenticated()"``` attribute can help these links shown up only for authorized login user.
+
+```html
+    <ul sec:authorize="isAuthenticated()">
+        <li><a th:href="@{'/posts/' + ${post.id} + '/edit'}">Edit</a></li>
+        <li><a th:href="@{'/posts/' + ${post.id} + '/delete'}">Delete</a></li>
+    </ul>
+```
+
+### 3. Mapping post url with preauthorized condition
+
+PostController.java
+```java
+//    Post mapping for Edit and Delete feature
+    @GetMapping("/posts/{id}/edit")
+    @PreAuthorize("isAuthenticated()")
+    public String getPostForEdit(@PathVariable Long id, Model model) {
+
+        // find post by id
+        Optional<Post> optionalPost = postService.getById(id);
+        // if post exist put it in model
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            model.addAttribute("post", post);
+            return "post_edit";
+        } else {
+            return "404";
+        }
+    }
+
+//    Mapping for post edit
+    @PostMapping("/posts/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public String updatePost(@PathVariable Long id, Post post, BindingResult result, Model model) {
+
+        Optional<Post> optionalPost = postService.getById(id);
+        if (optionalPost.isPresent()) {
+            Post existingPost = optionalPost.get();
+
+            existingPost.setTitle(post.getTitle());
+            existingPost.setBody(post.getBody());
+
+            postService.save(existingPost);
+        }
+        return "redirect:/posts/" + post.getId();
+    }
+
+```
+And we can add ```post_edit.html``` to update post title and body.
+
+### 4. Delete feature
+
+To make delete functionality working, you should make another ```deletePost``` public method for mapping and checking authorize.
+
+PostController.java
+```java
+//    Delete post
+    @GetMapping("/posts/{id}/delete")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public String deletePost(@PathVariable Long id) {
+
+        // find post by id
+        Optional<Post> optionalPost = postService.getById(id);
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+
+            postService.delete(post);
+            return "redirect:/";
+        } else {
+            return "404";
+        }
+    }
+```
+And finally, ```delete``` method for ```PostService``` would be needed for above codes.
+
+PostService.java
+```java
+    public void delete(Post post) { postRepository.delete(post); }
+}
+```
 	
 ## References
 - https://www.youtube.com/watch?v=7iWlCl35p9o
